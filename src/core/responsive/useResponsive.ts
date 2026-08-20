@@ -1,8 +1,8 @@
 import { useWindowDimensions } from 'react-native';
 import { breakpoints } from '../theme/tokens';
+import { Orientation } from './useOrientation';
 
 export type DeviceType = 'phone' | 'tablet' | 'foldable' | 'desktop';
-export type Orientation = 'portrait' | 'landscape';
 
 export interface ResponsiveInfo {
   width: number;
@@ -13,10 +13,6 @@ export interface ResponsiveInfo {
   isTabletOrLarger: boolean;
 }
 
-/**
- * Enterprise Responsive Layout Hook
- * Provides device type detection, breakpoint classification, and orientation tracking.
- */
 export const useResponsive = (): ResponsiveInfo => {
   const { width, height } = useWindowDimensions();
 
