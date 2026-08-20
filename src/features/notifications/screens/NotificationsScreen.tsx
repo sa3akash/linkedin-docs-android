@@ -49,7 +49,7 @@ export const NotificationsScreen: React.FC = () => {
               <Text style={[typography.body2, { color: colors.textSecondary }]} numberOfLines={2}>
                 {item.body}
               </Text>
-              <Text style={[typography.overline, { color: colors.textMuted, marginTop: 2 }]}>
+              <Text style={[typography.overline, styles.createdAtText, { color: colors.textMuted }]}>
                 {item.createdAt}
               </Text>
             </View>
@@ -83,5 +83,8 @@ const styles = StyleSheet.create({
   meta: {
     flex: 1,
     marginLeft: 12,
+  },
+  createdAtText: {
+    marginTop: 2,
   },
 });

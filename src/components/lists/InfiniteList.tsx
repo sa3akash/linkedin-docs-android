@@ -41,7 +41,7 @@ export function InfiniteList<T>({
 
   const renderEmpty = () => (
     <View style={[styles.emptyContainer, { padding: spacing.xxl }]}>
-      <Text style={[typography.body1, { color: colors.textMuted, textAlign: 'center' }]}>
+      <Text style={[typography.body1, styles.emptyText, { color: colors.textMuted }]}>
         {emptyText}
       </Text>
     </View>
@@ -69,5 +69,8 @@ const styles = StyleSheet.create({
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  emptyText: {
+    textAlign: 'center',
   },
 });

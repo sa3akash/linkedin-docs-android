@@ -103,3 +103,16 @@ jobs:
             android/app/build/outputs/bundle/release/*.aab
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+# $ git add .
+# $ git commit -m "ci: add automated github release with APK and AAB build artifacts"
+# $ git push origin main
+# # To https://github.com/sa3akash/linkedin-docs-android.git
+# # c312392..277c987 main -> main
+
+# $ git tag v1.0.0
+# $ git push origin v1.0.0
+# # To https://github.com/sa3akash/linkedin-docs-android.git
+# # * [new tag] v1.0.0 -> v1.0.0

@@ -68,12 +68,14 @@ export class SecurityService {
     const bodyString = body ? JSON.stringify(body) : '';
     const rawData = `${method.toUpperCase()}:${url}:${timestamp}:${bodyString}:${secretKey}`;
 
+    /* eslint-disable no-bitwise */
     let hash = 0;
     for (let i = 0; i < rawData.length; i++) {
       const char = rawData.charCodeAt(i);
       hash = (hash << 5) - hash + char;
       hash |= 0;
     }
+    /* eslint-enable no-bitwise */
 
     return `v1=${Math.abs(hash).toString(16)}_${timestamp}`;
   }

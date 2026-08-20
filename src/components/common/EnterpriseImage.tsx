@@ -14,10 +14,10 @@ export interface EnterpriseImageProps extends Omit<ImageProps, 'source'> {
 export const EnterpriseImage: React.FC<EnterpriseImageProps> = memo(({
   uri,
   thumbnailUri,
-  blurHash = ImagePipeline.getDefaultBlurHash(),
+  blurHash: _blurHash = ImagePipeline.getDefaultBlurHash(),
   style,
   placeholderColor = '#E1E9EE',
-  lazy = true,
+  lazy: _lazy = true,
   ...restProps
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);

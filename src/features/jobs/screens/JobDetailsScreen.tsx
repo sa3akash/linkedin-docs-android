@@ -54,7 +54,7 @@ export const JobDetailsScreen: React.FC<JobDetailsScreenProps> = ({ jobId }) => 
         Requirements
       </Text>
       {job.requirements.map((req, idx) => (
-        <Text key={idx} style={[typography.body2, { color: colors.textPrimary, marginVertical: 2 }]}>
+        <Text key={idx} style={[typography.body2, styles.reqText, { color: colors.textPrimary }]}>
           • {req}
         </Text>
       ))}
@@ -72,5 +72,8 @@ export const JobDetailsScreen: React.FC<JobDetailsScreenProps> = ({ jobId }) => 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  reqText: {
+    marginVertical: 2,
   },
 });

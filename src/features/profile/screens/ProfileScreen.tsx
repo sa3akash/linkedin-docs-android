@@ -50,11 +50,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ userId }) => {
       <View
         style={[
           styles.card,
+          styles.mainCard,
           {
             backgroundColor: colors.card,
             borderColor: colors.border,
             padding: spacing.lg,
-            marginTop: 40,
             marginHorizontal: spacing.md,
             borderRadius: radius.lg,
           },
@@ -119,7 +119,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ userId }) => {
             <Text style={[typography.body2, { color: colors.primary }]}>{exp.companyName}</Text>
             <Text style={[typography.caption, { color: colors.textMuted }]}>{exp.startDate} - Present</Text>
             {exp.description && (
-              <Text style={[typography.body2, { color: colors.textSecondary, marginTop: 4 }]}>
+              <Text style={[typography.body2, styles.expDescText, { color: colors.textSecondary }]}>
                 {exp.description}
               </Text>
             )}
@@ -180,6 +180,12 @@ const styles = StyleSheet.create({
   },
   card: {
     borderWidth: 1,
+  },
+  mainCard: {
+    marginTop: 40,
+  },
+  expDescText: {
+    marginTop: 4,
   },
   skillRow: {
     flexDirection: 'row',

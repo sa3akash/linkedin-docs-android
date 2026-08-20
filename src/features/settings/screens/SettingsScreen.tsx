@@ -51,9 +51,9 @@ export const SettingsScreen: React.FC = () => {
             onPress={() => setThemeMode(item.value)}
             style={[
               styles.row,
+              styles.borderRow,
               {
                 paddingVertical: spacing.md,
-                borderBottomWidth: 0.5,
                 borderBottomColor: colors.border,
               },
             ]}
@@ -88,9 +88,9 @@ export const SettingsScreen: React.FC = () => {
             onPress={() => setLanguage(item.value)}
             style={[
               styles.row,
+              styles.borderRow,
               {
                 paddingVertical: spacing.md,
-                borderBottomWidth: 0.5,
                 borderBottomColor: colors.border,
               },
             ]}
@@ -166,5 +166,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  borderRow: {
+    borderBottomWidth: 0.5,
   },
 });

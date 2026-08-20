@@ -14,23 +14,19 @@ export const SecondaryButton: React.FC<ButtonProps> = ({
 }) => {
   const { colors, spacing, radius, typography } = useTheme();
 
+  const dynamicStyles = {
+    borderColor: colors.primary,
+    borderRadius: radius.round,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+  };
+
   return (
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled || isLoading}
       activeOpacity={0.7}
-      style={[
-        styles.button,
-        {
-          backgroundColor: 'transparent',
-          borderColor: colors.primary,
-          borderWidth: 1.5,
-          borderRadius: radius.round,
-          paddingVertical: spacing.md,
-          paddingHorizontal: spacing.xl,
-        },
-        style,
-      ]}
+      style={[styles.button, dynamicStyles, style]}
     >
       {isLoading ? (
         <ActivityIndicator color={colors.primary} />
@@ -50,5 +46,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
   },
 });

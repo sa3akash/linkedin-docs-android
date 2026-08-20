@@ -10,7 +10,7 @@ export const ShimmerLoader: React.FC = () => {
     <View style={[styles.container, { padding: spacing.md }]}>
       <View style={styles.header}>
         <SkeletonLoader width={48} height={48} borderRadius={24} />
-        <View style={{ marginLeft: spacing.md, flex: 1 }}>
+        <View style={[styles.headerContent, { marginLeft: spacing.md }]}>
           <SkeletonLoader width="60%" height={16} style={{ marginBottom: spacing.xs }} />
           <SkeletonLoader width="40%" height={12} />
         </View>
@@ -29,5 +29,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  headerContent: {
+    flex: 1,
   },
 });

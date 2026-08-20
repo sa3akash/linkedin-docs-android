@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { View, StyleProp, ViewStyle } from 'react-native';
+import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { colors, spacing } from '../../../core/theme/tokens';
 
 export interface DividerProps {
@@ -9,5 +9,11 @@ export interface DividerProps {
 }
 
 export const Divider: React.FC<DividerProps> = memo(({ color = colors.border, marginVertical = spacing.sm, style }) => (
-  <View style={[{ height: 1, backgroundColor: color, marginVertical }, style]} />
+  <View style={[styles.divider, { backgroundColor: color, marginVertical }, style]} />
 ));
+
+const styles = StyleSheet.create({
+  divider: {
+    height: 1,
+  },
+});
