@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '../../../hooks/useTheme';
+import { useStyles } from '../../../hooks/useStyles';
+import { useKeyboardAvoidance } from '../../../hooks/useKeyboardAvoidance';
 import { useChatStore } from '../../../stores/chat.store';
 import { TextInput, PrimaryButton } from '../../../components';
 import { messagesApi } from '../api/messages.api';
 import { ChatMessage } from '../../../types';
+import { Theme } from '../../../theme';
 
 export interface ChatDetailsScreenProps {
   conversationId: string;
@@ -17,7 +19,10 @@ export const ChatDetailsScreen: React.FC<ChatDetailsScreenProps> = ({
   recipientName,
 }) => {
   const { t } = useTranslation();
-  const { colors, spacing, radius, typography } = useTheme();
+  const { styles, theme } = useStyles(createStyles);
+  const { typography } = theme;
+  const { containerPaddingBottom } = useKeyboardAvoidance({ extraOffset: 0 });
+
   const { activeMessages, setMessages, appendMessage } = useChatStore();
   const [inputText, setInputText] = useState('');
 
@@ -45,9 +50,9 @@ export const ChatDetailsScreen: React.FC<ChatDetailsScreenProps> = ({
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, padding: spacing.md }]}>
-        <Text style={[typography.subtitle1, { color: colors.textPrimary }]}>{recipientName}</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={[typography.subtitle1, styles.headerTitle]}>{recipientName}</Text>
       </View>
 
       <FlatList<ChatMessage>
@@ -59,20 +64,13 @@ export const ChatDetailsScreen: React.FC<ChatDetailsScreenProps> = ({
             <View
               style={[
                 styles.messageBubble,
-                {
-                  alignSelf: isMe ? 'flex-end' : 'flex-start',
-                  backgroundColor: isMe ? colors.primary : colors.surface,
-                  borderRadius: radius.md,
-                  padding: spacing.md,
-                  marginVertical: spacing.xxs,
-                  marginHorizontal: spacing.md,
-                },
+                isMe ? styles.myBubble : styles.otherBubble,
               ]}
             >
               <Text
                 style={[
                   typography.body2,
-                  { color: isMe ? colors.textInverse : colors.textPrimary },
+                  isMe ? styles.myMessageText : styles.otherMessageText,
                 ]}
               >
                 {item.text}
@@ -82,33 +80,69 @@ export const ChatDetailsScreen: React.FC<ChatDetailsScreenProps> = ({
         }}
       />
 
-      <View style={[styles.inputRow, { backgroundColor: colors.surface, borderTopColor: colors.border, padding: spacing.md }]}>
+      <View style={[styles.inputRow, { marginBottom: containerPaddingBottom }]}>
         <TextInput
           placeholder={t('messages.typeMessage')}
           value={inputText}
           onChangeText={setInputText}
-          containerStyle={{ flex: 1, marginBottom: 0, marginRight: spacing.sm }}
+          containerStyle={styles.textInputContainer}
         />
-        <PrimaryButton title={t('feed.send')} onPress={handleSend} style={{ width: 80 }} />
+        <PrimaryButton title={t('feed.send')} onPress={handleSend} style={styles.sendBtn} />
       </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => ({
   container: {
     flex: 1,
+    backgroundColor: theme.colors.background,
   },
   header: {
+    backgroundColor: theme.colors.surface,
     borderBottomWidth: 1,
-    alignItems: 'center',
+    borderBottomColor: theme.colors.border,
+    padding: theme.spacing.md,
+    alignItems: 'center' as const,
+  },
+  headerTitle: {
+    color: theme.colors.textPrimary,
   },
   messageBubble: {
-    maxWidth: '75%',
+    maxWidth: '75%' as const,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginVertical: theme.spacing.xxs,
+    marginHorizontal: theme.spacing.md,
+  },
+  myBubble: {
+    alignSelf: 'flex-end' as const,
+    backgroundColor: theme.colors.primary,
+  },
+  otherBubble: {
+    alignSelf: 'flex-start' as const,
+    backgroundColor: theme.colors.surface,
+  },
+  myMessageText: {
+    color: theme.colors.textInverse,
+  },
+  otherMessageText: {
+    color: theme.colors.textPrimary,
   },
   inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    backgroundColor: theme.colors.surface,
     borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    padding: theme.spacing.md,
+  },
+  textInputContainer: {
+    flex: 1,
+    marginBottom: 0,
+    marginRight: theme.spacing.sm,
+  },
+  sendBtn: {
+    width: 80,
   },
 });

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../hooks/useAuth';
-import { useTheme } from '../../../hooks/useTheme';
+import { useStyles } from '../../../hooks/useStyles';
+import { useKeyboardAvoidance } from '../../../hooks/useKeyboardAvoidance';
 import { TextInput, PasswordInput, PrimaryButton, SecondaryButton } from '../../../components';
 import { authApi } from '../api/auth.api';
+import { Theme } from '../../../theme';
 
 export interface LoginScreenProps {
   onNavigateToRegister: () => void;
@@ -16,7 +18,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   onNavigateToOTP,
 }) => {
   const { t } = useTranslation();
-  const { colors, spacing, typography } = useTheme();
+  const { styles, theme } = useStyles(createStyles);
+  const { typography } = theme;
+  const { containerPaddingBottom } = useKeyboardAvoidance({ extraOffset: 16 });
   const { setAuthSession } = useAuth();
 
   const [email, setEmail] = useState('alex.morgan@linkedin.com');
@@ -44,28 +48,19 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
   return (
     <ScrollView
-      contentContainerStyle={[
-        styles.container,
-        { backgroundColor: colors.background, padding: spacing.xl },
-      ]}
+      contentContainerStyle={[styles.container, { paddingBottom: containerPaddingBottom || theme.spacing.xl }]}
       keyboardShouldPersistTaps="handled"
     >
       <View style={styles.headerContainer}>
-        <Text style={[typography.h1, { color: colors.primary, marginBottom: spacing.xs }]}>
-          LinkedIn
-        </Text>
-        <Text style={[typography.h2, { color: colors.textPrimary, marginBottom: spacing.xs }]}>
-          {t('common.welcome')}
-        </Text>
-        <Text style={[typography.body2, { color: colors.textSecondary }]}>
+        <Text style={[typography.h1, styles.brandTitle]}>LinkedIn</Text>
+        <Text style={[typography.h2, styles.welcomeTitle]}>{t('common.welcome')}</Text>
+        <Text style={[typography.body2, styles.subtitle]}>
           Stay updated on your professional world
         </Text>
       </View>
 
       {error ? (
-        <Text style={[typography.caption, { color: colors.error, marginBottom: spacing.md }]}>
-          {error}
-        </Text>
+        <Text style={[typography.caption, styles.errorText]}>{error}</Text>
       ) : null}
 
       <TextInput
@@ -86,9 +81,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
       <TouchableOpacity
         onPress={() => onNavigateToOTP(email)}
-        style={{ alignSelf: 'flex-end', marginBottom: spacing.lg }}
+        style={styles.forgotPassBtn}
       >
-        <Text style={[typography.caption, { color: colors.primary }]}>
+        <Text style={[typography.caption, styles.forgotPassText]}>
           {t('auth.forgotPassword')}
         </Text>
       </TouchableOpacity>
@@ -97,7 +92,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         title={t('auth.login')}
         onPress={handleLogin}
         isLoading={loading}
-        style={{ marginBottom: spacing.md }}
+        style={styles.loginBtn}
       />
 
       <SecondaryButton title={t('auth.register')} onPress={onNavigateToRegister} />
@@ -105,12 +100,39 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => ({
   container: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: 'center' as const,
+    backgroundColor: theme.colors.background,
+    padding: theme.spacing.xl,
   },
   headerContainer: {
     marginBottom: 32,
+  },
+  brandTitle: {
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.xs,
+  },
+  welcomeTitle: {
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.xs,
+  },
+  subtitle: {
+    color: theme.colors.textSecondary,
+  },
+  errorText: {
+    color: theme.colors.error,
+    marginBottom: theme.spacing.md,
+  },
+  forgotPassBtn: {
+    alignSelf: 'flex-end' as const,
+    marginBottom: theme.spacing.lg,
+  },
+  forgotPassText: {
+    color: theme.colors.primary,
+  },
+  loginBtn: {
+    marginBottom: theme.spacing.md,
   },
 });

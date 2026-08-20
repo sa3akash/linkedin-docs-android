@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { UserProfile } from '../../types/user.types';
-import { useTheme } from '../../hooks/useTheme';
+import { useStyles } from '../../hooks/useStyles';
 import { PrimaryButton } from '../buttons/PrimaryButton';
+import { Theme } from '../../theme';
 
 export interface ProfileCardProps {
   user: UserProfile;
@@ -11,82 +12,85 @@ export interface ProfileCardProps {
 }
 
 export const ProfileCard: React.FC<ProfileCardProps> = ({ user, onPress, onConnect }) => {
-  const { colors, spacing, radius, typography, shadows } = useTheme();
+  const { styles, theme } = useStyles(createStyles);
+  const { typography } = theme;
 
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.9}
-      style={[
-        styles.card,
-        {
-          backgroundColor: colors.card,
-          borderColor: colors.border,
-          borderRadius: radius.lg,
-          padding: spacing.lg,
-          marginBottom: spacing.md,
-        },
-        shadows.sm,
-      ]}
-    >
+    <TouchableOpacity onPress={onPress} activeOpacity={0.9} style={styles.card}>
       <View style={styles.header}>
         {user.avatarUrl ? (
-          <Image source={{ uri: user.avatarUrl }} style={[styles.avatar, { borderRadius: radius.round }]} />
+          <Image source={{ uri: user.avatarUrl }} style={styles.avatar} />
         ) : (
-          <View
-            style={[
-              styles.avatarPlaceholder,
-              { backgroundColor: colors.primaryLight, borderRadius: radius.round },
-            ]}
-          >
-            <Text style={[typography.h3, { color: colors.textInverse }]}>
+          <View style={styles.avatarPlaceholder}>
+            <Text style={[typography.h3, styles.placeholderText]}>
               {user.firstName.charAt(0)}
             </Text>
           </View>
         )}
         <View style={styles.info}>
-          <Text style={[typography.subtitle1, { color: colors.textPrimary }]}>
+          <Text style={[typography.subtitle1, styles.nameText]}>
             {user.firstName} {user.lastName}
           </Text>
-          <Text style={[typography.caption, { color: colors.textSecondary }]} numberOfLines={2}>
+          <Text style={[typography.caption, styles.headlineText]} numberOfLines={2}>
             {user.headline}
           </Text>
-          <Text style={[typography.overline, { color: colors.textMuted, marginTop: spacing.xxs }]}>
+          <Text style={[typography.overline, styles.connectionsText]}>
             {user.connectionCount} connections
           </Text>
         </View>
       </View>
-      {onConnect && (
-        <PrimaryButton
-          title="Connect"
-          onPress={onConnect}
-          style={{ marginTop: spacing.md }}
-        />
-      )}
+      {onConnect ? (
+        <PrimaryButton title="Connect" onPress={onConnect} style={styles.connectBtn} />
+      ) : null}
     </TouchableOpacity>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => ({
   card: {
+    backgroundColor: theme.colors.card,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
     borderWidth: 1,
+    ...theme.shadows.sm,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
   },
   avatar: {
     width: 56,
     height: 56,
+    borderRadius: theme.radius.round,
   },
   avatarPlaceholder: {
     width: 56,
     height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: theme.radius.round,
+    backgroundColor: theme.colors.primaryLight,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  placeholderText: {
+    color: theme.colors.textInverse,
   },
   info: {
     flex: 1,
     marginLeft: 12,
+  },
+  nameText: {
+    color: theme.colors.textPrimary,
+  },
+  headlineText: {
+    color: theme.colors.textSecondary,
+  },
+  connectionsText: {
+    color: theme.colors.textMuted,
+    marginTop: theme.spacing.xxs,
+  },
+  connectBtn: {
+    marginTop: theme.spacing.md,
   },
 });
