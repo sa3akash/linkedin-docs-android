@@ -1,5 +1,11 @@
-import React, { memo, useRef } from 'react';
-import { Animated, TouchableWithoutFeedback, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import React, { memo } from 'react';
+import { TouchableWithoutFeedback, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
 export interface RipplePressableProps {
   children: React.ReactNode;
@@ -16,26 +22,31 @@ export const RipplePressable: React.FC<RipplePressableProps> = memo(({
   style,
   rippleColor = 'rgba(10, 102, 194, 0.2)',
 }) => {
-  const scale = useRef(new Animated.Value(1)).current;
-  const rippleScale = useRef(new Animated.Value(0)).current;
-  const rippleOpacity = useRef(new Animated.Value(0)).current;
+  const scale = useSharedValue(1);
+  const rippleScale = useSharedValue(0);
+  const rippleOpacity = useSharedValue(0);
 
   const handlePressIn = () => {
-    rippleScale.setValue(0);
-    rippleOpacity.setValue(1);
-
-    Animated.parallel([
-      Animated.spring(scale, { toValue: 0.96, useNativeDriver: true }),
-      Animated.timing(rippleScale, { toValue: 1, duration: 300, useNativeDriver: true }),
-    ]).start();
+    scale.value = withSpring(0.96);
+    rippleScale.value = 0;
+    rippleOpacity.value = 1;
+    rippleScale.value = withTiming(1, { duration: 300 });
   };
 
   const handlePressOut = () => {
-    Animated.parallel([
-      Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
-      Animated.timing(rippleOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
-    ]).start();
+    scale.value = withSpring(1);
+    rippleOpacity.value = withTiming(0, { duration: 200 });
   };
+
+  const animatedContainerStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const animatedRippleStyle = useAnimatedStyle(() => ({
+    backgroundColor: rippleColor,
+    opacity: rippleOpacity.value,
+    transform: [{ scale: rippleScale.value }],
+  }));
 
   return (
     <TouchableWithoutFeedback
@@ -44,17 +55,8 @@ export const RipplePressable: React.FC<RipplePressableProps> = memo(({
       onPress={onPress}
       onLongPress={onLongPress}
     >
-      <Animated.View style={[styles.container, { transform: [{ scale }] }, style]}>
-        <Animated.View
-          style={[
-            styles.ripple,
-            {
-              backgroundColor: rippleColor,
-              opacity: rippleOpacity,
-              transform: [{ scale: rippleScale }],
-            },
-          ]}
-        />
+      <Animated.View style={[styles.container, animatedContainerStyle, style]}>
+        <Animated.View style={[styles.ripple, animatedRippleStyle]} />
         {children}
       </Animated.View>
     </TouchableWithoutFeedback>

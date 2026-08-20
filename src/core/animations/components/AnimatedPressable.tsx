@@ -1,6 +1,10 @@
 import React, { memo } from 'react';
-import { Animated, TouchableWithoutFeedback, StyleProp, ViewStyle } from 'react-native';
-import { useScaleAnimation } from '../hooks/useScaleAnimation';
+import { TouchableWithoutFeedback, StyleProp, ViewStyle } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
 
 export interface AnimatedPressableProps {
   children: React.ReactNode;
@@ -15,15 +19,23 @@ export const AnimatedPressable: React.FC<AnimatedPressableProps> = memo(({
   style,
   targetScale = 0.95,
 }) => {
-  const { scale, scaleTo } = useScaleAnimation(1);
+  const scale = useSharedValue(1);
+
+  const handlePressIn = () => {
+    scale.value = withSpring(targetScale, { damping: 10, stiffness: 200 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 10, stiffness: 200 });
+  };
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   return (
-    <TouchableWithoutFeedback
-      onPressIn={() => scaleTo(targetScale)}
-      onPressOut={() => scaleTo(1)}
-      onPress={onPress}
-    >
-      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    <TouchableWithoutFeedback onPressIn={handlePressIn} onPressOut={handlePressOut} onPress={onPress}>
+      <Animated.View style={[animatedStyle, style]}>{children}</Animated.View>
     </TouchableWithoutFeedback>
   );
 });

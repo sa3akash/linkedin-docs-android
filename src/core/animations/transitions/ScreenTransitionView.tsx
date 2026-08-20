@@ -1,40 +1,36 @@
-import React, { memo, useEffect, useRef } from 'react';
-import { Animated, StyleProp, ViewStyle, StyleSheet } from 'react-native';
-import { ScreenTransitionEngine, ScreenTransitionType } from './screenTransitions';
+import React, { memo, useEffect } from 'react';
+import { StyleProp, ViewStyle } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 
 export interface ScreenTransitionViewProps {
   children: React.ReactNode;
-  type?: ScreenTransitionType;
-  duration?: number;
+  type?: 'fade' | 'slideLeft' | 'slideRight' | 'slideUp';
   style?: StyleProp<ViewStyle>;
-  onTransitionEnd?: () => void;
 }
 
 export const ScreenTransitionView: React.FC<ScreenTransitionViewProps> = memo(({
   children,
-  type = 'slide-left',
-  duration = 350,
+  type = 'fade',
   style,
-  onTransitionEnd,
 }) => {
-  const animatedValue = useRef(new Animated.Value(0)).current;
+  const opacity = useSharedValue(0);
+  const translateX = useSharedValue(type === 'slideLeft' ? 100 : type === 'slideRight' ? -100 : 0);
+  const translateY = useSharedValue(type === 'slideUp' ? 50 : 0);
 
   useEffect(() => {
-    const animation = ScreenTransitionEngine.createTransition(type, animatedValue, { duration });
-    animation.start(() => {
-      if (onTransitionEnd) {
-        onTransitionEnd();
-      }
-    });
-  }, [type, duration, animatedValue, onTransitionEnd]);
+    opacity.value = withTiming(1, { duration: 350 });
+    translateX.value = withTiming(0, { duration: 350 });
+    translateY.value = withTiming(0, { duration: 350 });
+  }, [opacity, translateX, translateY]);
 
-  const animatedStyles = ScreenTransitionEngine.getInterpolatedStyles(type, animatedValue);
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateX: translateX.value }, { translateY: translateY.value }],
+  }));
 
-  return <Animated.View style={[styles.container, animatedStyles, style]}>{children}</Animated.View>;
-});
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  return <Animated.View style={[animatedStyle, style]}>{children}</Animated.View>;
 });

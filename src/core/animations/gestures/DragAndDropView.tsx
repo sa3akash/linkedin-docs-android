@@ -1,5 +1,10 @@
-import React, { memo, useRef } from 'react';
-import { Animated, PanResponder, StyleProp, ViewStyle } from 'react-native';
+import React, { memo } from 'react';
+import { StyleProp, ViewStyle, TouchableWithoutFeedback } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
 
 export interface DragAndDropViewProps {
   children: React.ReactNode;
@@ -12,30 +17,24 @@ export const DragAndDropView: React.FC<DragAndDropViewProps> = memo(({
   onDragEnd,
   style,
 }) => {
-  const pan = useRef(new Animated.ValueXY()).current;
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], {
-        useNativeDriver: false,
-      }),
-      onPanResponderRelease: (_, gestureState) => {
-        if (onDragEnd) {
-          onDragEnd(gestureState.moveX, gestureState.moveY);
-        }
-        Animated.spring(pan, {
-          toValue: { x: 0, y: 0 },
-          friction: 6,
-          useNativeDriver: false,
-        }).start();
-      },
-    })
-  ).current;
+  const handleRelease = () => {
+    if (onDragEnd) {
+      onDragEnd(translateX.value, translateY.value);
+    }
+    translateX.value = withSpring(0);
+    translateY.value = withSpring(0);
+  };
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }, { translateY: translateY.value }],
+  }));
 
   return (
-    <Animated.View style={[pan.getLayout(), style]} {...panResponder.panHandlers}>
-      {children}
-    </Animated.View>
+    <TouchableWithoutFeedback onPressOut={handleRelease}>
+      <Animated.View style={[animatedStyle, style]}>{children}</Animated.View>
+    </TouchableWithoutFeedback>
   );
 });

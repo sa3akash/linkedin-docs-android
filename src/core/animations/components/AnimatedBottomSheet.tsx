@@ -1,5 +1,11 @@
-import React, { memo, useEffect, useRef } from 'react';
-import { Animated, Modal, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import React, { memo, useEffect } from 'react';
+import { Modal, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+} from 'react-native-reanimated';
 
 export interface AnimatedBottomSheetProps {
   visible: boolean;
@@ -14,38 +20,31 @@ export const AnimatedBottomSheet: React.FC<AnimatedBottomSheetProps> = memo(({
   children,
   height = 300,
 }) => {
-  const translateY = useRef(new Animated.Value(height)).current;
+  const translateY = useSharedValue(height);
 
   useEffect(() => {
     if (visible) {
-      Animated.timing(translateY, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+      translateY.value = withSpring(0, { damping: 15, stiffness: 120 });
     } else {
-      Animated.timing(translateY, {
-        toValue: height,
-        duration: 250,
-        useNativeDriver: true,
-      }).start();
+      translateY.value = withTiming(height, { duration: 250 });
     }
-  }, [visible, translateY, height]);
+  }, [visible, height, translateY]);
 
-  if (!visible) return null;
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
 
   return (
-    <Modal transparent visible={visible} onRequestClose={onClose} animationType="none">
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.backdrop}>
-          <TouchableWithoutFeedback>
-            <Animated.View style={[styles.sheet, { height, transform: [{ translateY }] }]}>
-              <View style={styles.dragHandle} />
-              {children}
-            </Animated.View>
-          </TouchableWithoutFeedback>
-        </View>
-      </TouchableWithoutFeedback>
+    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
+      <View style={styles.backdrop}>
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={StyleSheet.absoluteFill} />
+        </TouchableWithoutFeedback>
+        <Animated.View style={[styles.sheet, { height }, animatedStyle]}>
+          <View style={styles.handle} />
+          {children}
+        </Animated.View>
+      </View>
     </Modal>
   );
 });
@@ -53,19 +52,19 @@ export const AnimatedBottomSheet: React.FC<AnimatedBottomSheetProps> = memo(({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
   sheet: {
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     padding: 16,
   },
-  dragHandle: {
+  handle: {
     width: 40,
     height: 4,
-    backgroundColor: '#D0D0D0',
+    backgroundColor: '#CCCCCC',
     borderRadius: 2,
     alignSelf: 'center',
     marginBottom: 12,

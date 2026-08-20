@@ -1,15 +1,10 @@
-import React, { memo, useRef } from 'react';
-import {
-  Animated,
-  PanResponder,
-  StyleProp,
-  ViewStyle,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.35;
+import React, { memo } from 'react';
+import { StyleSheet, StyleProp, ViewStyle, TouchableWithoutFeedback } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
 
 export interface SwipeCardProps {
   children: React.ReactNode;
@@ -24,67 +19,33 @@ export const SwipeCard: React.FC<SwipeCardProps> = memo(({
   onSwipeRight,
   style,
 }) => {
-  const pan = useRef(new Animated.ValueXY()).current;
+  const translateX = useSharedValue(0);
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], {
-        useNativeDriver: false,
-      }),
-      onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dx > SWIPE_THRESHOLD) {
-          Animated.timing(pan, {
-            toValue: { x: SCREEN_WIDTH * 1.5, y: gestureState.dy },
-            duration: 250,
-            useNativeDriver: false,
-          }).start(() => {
-            pan.setValue({ x: 0, y: 0 });
-            if (onSwipeRight) onSwipeRight();
-          });
-        } else if (gestureState.dx < -SWIPE_THRESHOLD) {
-          Animated.timing(pan, {
-            toValue: { x: -SCREEN_WIDTH * 1.5, y: gestureState.dy },
-            duration: 250,
-            useNativeDriver: false,
-          }).start(() => {
-            pan.setValue({ x: 0, y: 0 });
-            if (onSwipeLeft) onSwipeLeft();
-          });
-        } else {
-          Animated.spring(pan, {
-            toValue: { x: 0, y: 0 },
-            friction: 5,
-            useNativeDriver: false,
-          }).start();
-        }
-      },
-    })
-  ).current;
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
 
-  const rotate = pan.x.interpolate({
-    inputRange: [-SCREEN_WIDTH, 0, SCREEN_WIDTH],
-    outputRange: ['-20deg', '0deg', '20deg'],
-  });
+  const handleSwipeLeft = () => {
+    translateX.value = withSpring(-400);
+    if (onSwipeLeft) onSwipeLeft();
+  };
+
+  const handleSwipeRight = () => {
+    translateX.value = withSpring(400);
+    if (onSwipeRight) onSwipeRight();
+  };
 
   return (
-    <Animated.View
-      style={[
-        styles.card,
-        {
-          transform: [{ translateX: pan.x }, { translateY: pan.y }, { rotate }],
-        },
-        style,
-      ]}
-      {...panResponder.panHandlers}
-    >
-      {children}
-    </Animated.View>
+    <TouchableWithoutFeedback onLongPress={handleSwipeLeft} onPress={handleSwipeRight}>
+      <Animated.View style={[styles.card, animatedStyle, style]}>{children}</Animated.View>
+    </TouchableWithoutFeedback>
   );
 });
 
 const styles = StyleSheet.create({
   card: {
     width: '100%',
+    borderRadius: 16,
+    overflow: 'hidden',
   },
 });

@@ -1,6 +1,11 @@
 import React, { memo, useEffect } from 'react';
-import { Animated, ViewProps, StyleProp, ViewStyle } from 'react-native';
-import { useFadeAnimation } from '../hooks/useFadeAnimation';
+import { ViewProps, StyleProp, ViewStyle } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
+} from 'react-native-reanimated';
 
 export interface AnimatedViewProps extends ViewProps {
   children: React.ReactNode;
@@ -10,17 +15,18 @@ export interface AnimatedViewProps extends ViewProps {
 }
 
 export const AnimatedView: React.FC<AnimatedViewProps> = memo(({ children, style, delay = 0, ...restProps }) => {
-  const { opacity, fadeIn } = useFadeAnimation(0, 300);
+  const opacity = useSharedValue(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fadeIn();
-    }, delay);
-    return () => clearTimeout(timer);
-  }, [fadeIn, delay]);
+    opacity.value = withDelay(delay, withTiming(1, { duration: 300 }));
+  }, [delay, opacity]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
 
   return (
-    <Animated.View style={[{ opacity }, style]} {...restProps}>
+    <Animated.View style={[animatedStyle, style]} {...restProps}>
       {children}
     </Animated.View>
   );

@@ -1,6 +1,11 @@
-import React, { memo } from 'react';
-import { Animated, StyleProp, ViewStyle, StyleSheet } from 'react-native';
-import { useSkeletonAnimation } from '../hooks/useSkeletonAnimation';
+import React, { memo, useEffect } from 'react';
+import { StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 
 export interface SkeletonViewProps {
   width?: number | string;
@@ -11,30 +16,26 @@ export interface SkeletonViewProps {
 
 export const SkeletonView: React.FC<SkeletonViewProps> = memo(({
   width = '100%',
-  height = 20,
+  height = 16,
   borderRadius = 4,
   style,
 }) => {
-  const opacity = useSkeletonAnimation(1200);
+  const opacity = useSharedValue(0.4);
 
-  return (
-    <Animated.View
-      style={[
-        styles.skeleton,
-        {
-          width: width as any,
-          height,
-          borderRadius,
-          opacity,
-        },
-        style,
-      ]}
-    />
-  );
+  useEffect(() => {
+    opacity.value = withRepeat(withTiming(0.9, { duration: 750 }), -1, true);
+  }, [opacity]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
+  return <Animated.View style={[styles.skeleton, { width, height, borderRadius }, animatedStyle, style]} />;
 });
 
 const styles = StyleSheet.create({
   skeleton: {
     backgroundColor: '#E1E9EE',
+    marginVertical: 4,
   },
 });

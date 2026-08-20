@@ -13,20 +13,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js Environment
-        uses: actions/setup-node@v4
+      - name: Setup Bun Environment
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22.x
-          cache: 'npm'
+          bun-version: latest
 
       - name: Install Dependencies
-        run: npm ci
+        run: bun install
 
       - name: Strict TypeScript Compilation Check
-        run: npx tsc --noEmit
+        run: bun x tsc --noEmit
 
       - name: ESLint Code Quality Verification
-        run: npm run lint
+        run: bun run lint
 
   unit-test:
     name: Run Jest Unit & Integration Test Suite
@@ -35,17 +34,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js Environment
-        uses: actions/setup-node@v4
+      - name: Setup Bun Environment
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22.x
-          cache: 'npm'
+          bun-version: latest
 
       - name: Install Dependencies
-        run: npm ci
+        run: bun install
 
       - name: Execute Jest Tests with Coverage
-        run: npm test -- --coverage --maxWorkers=2
+        run: bun test
 
   build-android:
     name: Build Android Bundle (APK/AAB)
@@ -60,13 +58,13 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun Environment
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22.x
+          bun-version: latest
 
       - name: Install Dependencies
-        run: npm ci
+        run: bun install
 
       - name: Build Android Release Bundle
         run: |

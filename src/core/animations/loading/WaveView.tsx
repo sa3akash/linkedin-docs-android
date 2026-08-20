@@ -1,67 +1,25 @@
-import React, { memo, useEffect, useRef } from 'react';
-import { Animated, View, StyleSheet } from 'react-native';
+import React, { memo } from 'react';
+import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import { ShimmerView } from './ShimmerView';
 
 export interface WaveViewProps {
   barCount?: number;
-  color?: string;
-  size?: number;
+  style?: StyleProp<ViewStyle>;
 }
 
-export const WaveView: React.FC<WaveViewProps> = memo(({ barCount = 4, color = '#0A66C2', size = 24 }) => {
-  const animations = useRef(Array.from({ length: barCount }, () => new Animated.Value(0.3))).current;
-
-  useEffect(() => {
-    const sequence = animations.map((anim, index) =>
-      Animated.loop(
-        Animated.sequence([
-          Animated.delay(index * 150),
-          Animated.timing(anim, {
-            toValue: 1,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-          Animated.timing(anim, {
-            toValue: 0.3,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-        ])
-      )
-    );
-
-    sequence.forEach((a) => a.start());
-
-    return () => sequence.forEach((a) => a.stop());
-  }, [animations]);
-
-  return (
-    <View style={styles.container}>
-      {animations.map((anim, i) => (
-        <Animated.View
-          key={i}
-          style={[
-            styles.bar,
-            {
-              height: size,
-              backgroundColor: color,
-              transform: [{ scaleY: anim }],
-            },
-          ]}
-        />
-      ))}
-    </View>
-  );
-});
+export const WaveView: React.FC<WaveViewProps> = memo(({ barCount = 4, style }) => (
+  <View style={[styles.container, style]}>
+    {Array.from({ length: barCount }).map((_, index) => (
+      <ShimmerView key={index} width={40 + index * 20} height={12} style={styles.bar} />
+    ))}
+  </View>
+));
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
+    padding: 8,
   },
   bar: {
-    width: 4,
-    borderRadius: 2,
+    marginVertical: 4,
   },
 });

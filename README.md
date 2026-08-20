@@ -1,97 +1,110 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Enterprise React Native CLI Architecture (LinkedIn / Instagram / TikTok Scale)
 
-# Getting Started
+A production-grade, highly scalable React Native CLI application architecture built with **100% Strict TypeScript**, Clean Modular Architecture, Native WebSockets, Reanimated UI-thread animations, MMKV Encrypted Storage, 6-Tier Caching, Advanced Network Layer, and Enterprise Security Hardening.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## 🏛️ Architecture Overview
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+```txt
+src/
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+app/                     # Application entry, navigation stacks, root providers
+core/                    # Infrastructure & Core Engine Subsystems
+├── analytics/           # Event tracking & telemetry (User, Feed, Jobs, Messaging)
+├── animations/          # Reanimated presets, hooks, transitions, gestures, & bottom sheet
+├── cache/               # 6-Tier Multi-Level Cache (Memory, MMKV, Disk, React Query, Image, Video)
+├── config/              # Environment URLs & build configurations
+├── constants/           # Storage keys & limit caps
+├── crash-recovery/      # Session snapshots, crash flags, & recovery manager
+├── deep-linking/        # Universal, App, Push, Marketing UTM, & Referral link router
+├── drafts/              # Unsaved draft auto-save hook & persistent service
+├── errors/              # Typed Error hierarchy & global error mapper (mapUnknownToAppError)
+├── feature-flags/       # Remote config & A/B testing variants engine
+├── lifecycle/           # Foreground auto-reconnect, background timing, & session expiry
+├── localization/        # Multi-language i18n translation dictionary
+├── media/               # BlurHash image pipeline & HLS/DASH video pipeline
+├── monitoring/          # FPS, render latency, & performance monitor
+├── navigation/          # React Navigation stacks & tabs
+├── network/             # Request engine, deduplication, batching, retry & offline queues
+├── permissions/         # Native PermissionsAndroid handlers & feature permission guards
+├── responsive/          # Responsive hooks (screen size, breakpoints, orientation, safe area)
+├── search/              # Debounced search, infinite search, history, & trending searches
+├── security/            # SSL pinning, root/jailbreak detection, FLAG_SECURE, HMAC signing
+├── storage/             # Encrypted MMKV key-value storage engine
+├── theme/               # Atomic design tokens & theme provider
+├── update/              # Force update, soft update, maintenance mode, & store redirects
+├── uploads/             # Resumable chunk upload manager
+└── websocket/           # Native WebSocket client with auto-reconnect & heartbeat
 
-```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
+shared/                  # Cross-Cutting Reusable Assets
+├── components/          # 16-Component UI Factory library
+├── hooks/               # Custom utility hooks
+├── providers/           # AppProviders wrapper tree (QueryClient, SafeArea)
+├── services/            # Shared API clients & HTTP services
+├── types/               # Global TypeScript definitions
+├── utils/               # Formatting & RTL layout helpers
+└── validations/         # Form validation schemas
 ```
 
-## Step 2: Build and run your app
+---
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## ⚡ Quick Start with Bun
 
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+### 1. Install Dependencies
+```bash
+bun install
 ```
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+### 2. Strict Type Check & Compilation Audit
+```bash
+bun x tsc --noEmit
 ```
 
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
+### 3. iOS Native Dependencies Setup
+```bash
+cd ios && bundle exec pod install && cd ..
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+### 4. Run Mobile App
+```bash
+# Android
+bun run android
 
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+# iOS
+bun run ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+---
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## 🚀 Key Enterprise Features
 
-## Step 3: Modify your app
+### 🔌 Native WebSocket Subsystem
+- Native `WebSocket` client (`src/services/socket/socket.service.ts`) built for Elysia / Bun native WS backend servers.
+- Auto-reconnect with exponential backoff (up to 10 attempts), 25s ping/pong heartbeats, presence state tracking (`ONLINE`, `AWAY`, `OFFLINE`), and 3s debounced typing clear timers.
 
-Now that you have successfully run the app, let's make changes!
+### 🎭 Reanimated Animation System (`react-native-reanimated`)
+- 60fps native UI-thread execution for presets, hooks, gestures (`SwipeCard`, `SwipeAction`, `PullToRefreshView`, `DragAndDropView`), interactions (`LikeButton`, `RipplePressable`), and `BottomSheetContainer`.
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+### 🛡️ Enterprise Permission Manager
+- Native `PermissionsAndroid` handlers for Camera, Microphone, Contacts, Location, Photos, Notifications, Storage, Bluetooth, Calendar.
+- `usePermissionGuard(permissionType)` hook automatically checks and requests device permissions before executing feature callbacks.
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+### 💾 6-Tier Advanced Caching System
+- Memory Cache (LRU + TTL), MMKV Cache, Disk Cache (Base64 binary blobs), React Query Cache, Image Cache, and Video Cache unified under `CacheManager`.
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+### ⚡ Advanced Network Layer Engine
+- Inflight Request Deduplication, 50ms Request Batching, Cache Interceptors, Retry Queue (exponential backoff), Offline Request Queue (MMKV persistence + auto-flush on reconnect), and Request Priority (`HIGH`, `NORMAL`, `LOW`).
 
-## Congratulations! :tada:
+### 🎨 16-Component UI Factory (`src/shared/components/ui/`)
+- `Avatar`, `Badge`, `Chip`, `Tag`, `Divider`, `Tooltip`, `Snackbar`, `Toast`, `Banner`, `EmptyState`, `ErrorState`, `InfiniteLoader`, `Timeline`, `Tabs`, `Accordion`, `Carousel`.
 
-You've successfully run and modified your React Native App. :partying_face:
+---
 
-### Now what?
+## ⚙️ CI/CD Pipeline Setup
+Automated GitHub Actions CI/CD workflow defined in `.github/workflows/ci.yml` powered by `oven-sh/setup-bun@v2` for fast dependency installation and type audits.
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+---
 
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## 📄 License
+MIT License.

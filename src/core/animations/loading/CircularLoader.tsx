@@ -1,51 +1,40 @@
-import React, { memo, useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
+import React, { memo, useEffect } from 'react';
+import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 
 export interface CircularLoaderProps {
   size?: number;
   color?: string;
-  strokeWidth?: number;
+  style?: StyleProp<ViewStyle>;
 }
 
 export const CircularLoader: React.FC<CircularLoaderProps> = memo(({
-  size = 36,
+  size = 32,
   color = '#0A66C2',
-  strokeWidth = 3,
+  style,
 }) => {
-  const rotateValue = useRef(new Animated.Value(0)).current;
+  const rotation = useSharedValue(0);
 
   useEffect(() => {
-    const animation = Animated.loop(
-      Animated.timing(rotateValue, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      })
-    );
-    animation.start();
-    return () => animation.stop();
-  }, [rotateValue]);
+    rotation.value = withRepeat(withTiming(360, { duration: 1000 }), -1, false);
+  }, [rotation]);
 
-  const rotate = rotateValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
 
   return (
-    <View style={[styles.container, { width: size, height: size }]}>
+    <View style={[styles.container, { width: size, height: size }, style]}>
       <Animated.View
         style={[
           styles.spinner,
-          {
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            borderWidth: strokeWidth,
-            borderColor: 'transparent',
-            borderTopColor: color,
-            borderRightColor: color,
-            transform: [{ rotate }],
-          },
+          { width: size, height: size, borderRadius: size / 2, borderColor: color },
+          animatedStyle,
         ]}
       />
     </View>
@@ -58,6 +47,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   spinner: {
-    position: 'absolute',
+    borderWidth: 3,
+    borderTopColor: 'transparent',
   },
 });

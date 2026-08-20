@@ -1,34 +1,35 @@
-import React, { memo, useEffect, useRef } from 'react';
-import { Animated, StyleProp, ViewStyle } from 'react-native';
+import React, { memo, useEffect } from 'react';
+import { StyleProp, ViewStyle } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 
 export interface PulseViewProps {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
-  duration?: number;
 }
 
-export const PulseView: React.FC<PulseViewProps> = memo(({ children, style, duration = 1000 }) => {
-  const scale = useRef(new Animated.Value(1)).current;
+export const PulseView: React.FC<PulseViewProps> = memo(({ children, style }) => {
+  const scale = useSharedValue(1);
 
   useEffect(() => {
-    const animation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(scale, {
-          toValue: 1.05,
-          duration: duration / 2,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scale, {
-          toValue: 1,
-          duration: duration / 2,
-          useNativeDriver: true,
-        }),
-      ])
+    scale.value = withRepeat(
+      withSequence(
+        withTiming(1.05, { duration: 600 }),
+        withTiming(1, { duration: 600 })
+      ),
+      -1,
+      true
     );
+  }, [scale]);
 
-    animation.start();
-    return () => animation.stop();
-  }, [scale, duration]);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
-  return <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>;
+  return <Animated.View style={[animatedStyle, style]}>{children}</Animated.View>;
 });

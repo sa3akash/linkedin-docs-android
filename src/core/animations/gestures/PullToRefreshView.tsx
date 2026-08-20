@@ -1,55 +1,37 @@
-import React, { memo, useRef, useState } from 'react';
-import { Animated, PanResponder, StyleProp, ViewStyle, StyleSheet, ActivityIndicator, View } from 'react-native';
+import React, { memo } from 'react';
+import { View, ActivityIndicator, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
 
 export interface PullToRefreshViewProps {
   children: React.ReactNode;
-  onRefresh: () => Promise<void>;
-  threshold?: number;
+  refreshing: boolean;
+  onRefresh: () => void;
   style?: StyleProp<ViewStyle>;
 }
 
 export const PullToRefreshView: React.FC<PullToRefreshViewProps> = memo(({
   children,
-  onRefresh,
-  threshold = 80,
+  refreshing,
   style,
 }) => {
-  const [refreshing, setRefreshing] = useState(false);
-  const translateY = useRef(new Animated.Value(0)).current;
+  const pullDistance = useSharedValue(0);
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gestureState) => gestureState.dy > 15 && !refreshing,
-      onPanResponderMove: (_, gestureState) => {
-        if (gestureState.dy > 0) {
-          // Resistance formula
-          translateY.setValue(Math.min(gestureState.dy * 0.5, threshold * 1.5));
-        }
-      },
-      onPanResponderRelease: async (_, gestureState) => {
-        if (gestureState.dy * 0.5 >= threshold && !refreshing) {
-          setRefreshing(true);
-          Animated.spring(translateY, { toValue: threshold, useNativeDriver: true }).start();
-
-          try {
-            await onRefresh();
-          } finally {
-            setRefreshing(false);
-            Animated.spring(translateY, { toValue: 0, useNativeDriver: true }).start();
-          }
-        } else {
-          Animated.spring(translateY, { toValue: 0, useNativeDriver: true }).start();
-        }
-      },
-    })
-  ).current;
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: refreshing ? 50 : withSpring(pullDistance.value) }],
+  }));
 
   return (
-    <View style={[styles.container, style]} {...panResponder.panHandlers}>
-      <Animated.View style={[styles.indicator, { transform: [{ translateY }] }]}>
-        <ActivityIndicator size="small" color="#0A66C2" />
-      </Animated.View>
-      <Animated.View style={[{ transform: [{ translateY }] }]}>{children}</Animated.View>
+    <View style={styles.container}>
+      {refreshing && (
+        <View style={styles.loader}>
+          <ActivityIndicator size="small" color="#0A66C2" />
+        </View>
+      )}
+      <Animated.View style={[animatedStyle, style]}>{children}</Animated.View>
     </View>
   );
 });
@@ -58,13 +40,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  indicator: {
+  loader: {
     position: 'absolute',
-    top: -40,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 40,
+    top: 10,
+    alignSelf: 'center',
+    zIndex: 10,
   },
 });

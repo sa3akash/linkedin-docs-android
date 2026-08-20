@@ -1,53 +1,77 @@
-import React, { memo, useRef, useCallback } from 'react';
-import { Animated, TouchableWithoutFeedback, View, StyleSheet, Text } from 'react-native';
+import React, { memo, useState, useCallback } from 'react';
+import { Text, TouchableOpacity, StyleSheet, View } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSequence,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
 export interface LikeButtonProps {
-  isLiked: boolean;
-  onToggleLike: () => void;
+  initialLiked?: boolean;
   likeCount?: number;
+  onLikeToggle?: (liked: boolean) => void;
 }
 
-export const LikeButton: React.FC<LikeButtonProps> = memo(({ isLiked, onToggleLike, likeCount }) => {
-  const scale = useRef(new Animated.Value(1)).current;
-  const burstScale = useRef(new Animated.Value(0)).current;
-  const burstOpacity = useRef(new Animated.Value(1)).current;
+export const LikeButton: React.FC<LikeButtonProps> = memo(({
+  initialLiked = false,
+  likeCount = 0,
+  onLikeToggle,
+}) => {
+  const [isLiked, setIsLiked] = useState(initialLiked);
+  const [count, setCount] = useState(likeCount);
+
+  const scale = useSharedValue(1);
+  const burstScale = useSharedValue(0);
+  const burstOpacity = useSharedValue(0);
 
   const triggerAnimation = useCallback(() => {
-    // Heart Burst + Scale Animation
-    burstScale.setValue(0.5);
-    burstOpacity.setValue(1);
+    scale.value = withSequence(
+      withSpring(1.4, { damping: 4, stiffness: 200 }),
+      withSpring(1, { damping: 6, stiffness: 150 })
+    );
 
-    Animated.parallel([
-      Animated.sequence([
-        Animated.spring(scale, { toValue: 1.3, friction: 3, useNativeDriver: true }),
-        Animated.spring(scale, { toValue: 1, friction: 5, useNativeDriver: true }),
-      ]),
-      Animated.timing(burstScale, { toValue: 2, duration: 400, useNativeDriver: true }),
-      Animated.timing(burstOpacity, { toValue: 0, duration: 400, useNativeDriver: true }),
-    ]).start();
+    burstScale.value = 0.5;
+    burstOpacity.value = 1;
 
-    onToggleLike();
-  }, [scale, burstScale, burstOpacity, onToggleLike]);
+    burstScale.value = withTiming(2, { duration: 400 });
+    burstOpacity.value = withTiming(0, { duration: 400 });
+  }, [scale, burstScale, burstOpacity]);
+
+  const handlePress = useCallback(() => {
+    const nextLiked = !isLiked;
+    setIsLiked(nextLiked);
+    setCount((prev) => (nextLiked ? prev + 1 : prev - 1));
+
+    if (nextLiked) {
+      triggerAnimation();
+    }
+
+    if (onLikeToggle) {
+      onLikeToggle(nextLiked);
+    }
+  }, [isLiked, triggerAnimation, onLikeToggle]);
+
+  const animatedHeartStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const animatedBurstStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: burstScale.value }],
+    opacity: burstOpacity.value,
+  }));
 
   return (
-    <TouchableWithoutFeedback onPress={triggerAnimation}>
-      <View style={styles.container}>
-        {/* Heart Burst Particle Effect */}
-        <Animated.View
-          style={[
-            styles.burst,
-            {
-              transform: [{ scale: burstScale }],
-              opacity: burstOpacity,
-            },
-          ]}
-        />
-        <Animated.View style={{ transform: [{ scale }] }}>
-          <Text style={[styles.icon, isLiked && styles.likedIcon]}>{isLiked ? '❤️' : '🤍'}</Text>
-        </Animated.View>
-        {likeCount !== undefined && <Text style={styles.count}>{likeCount}</Text>}
+    <TouchableOpacity activeOpacity={0.8} onPress={handlePress} style={styles.container}>
+      <View style={styles.heartWrapper}>
+        <Animated.View style={[styles.burst, animatedBurstStyle]} />
+        <Animated.Text style={[styles.heartText, animatedHeartStyle]}>
+          {isLiked ? '❤️' : '🤍'}
+        </Animated.Text>
       </View>
-    </TouchableWithoutFeedback>
+      <Text style={[styles.countText, isLiked && styles.countTextLiked]}>{count}</Text>
+    </TouchableOpacity>
   );
 });
 
@@ -56,27 +80,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 8,
+  },
+  heartWrapper: {
     position: 'relative',
-  },
-  icon: {
-    fontSize: 24,
-  },
-  likedIcon: {
-    transform: [{ scale: 1.1 }],
-  },
-  count: {
-    marginLeft: 6,
-    fontSize: 14,
-    color: '#00000099',
-    fontWeight: '600',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   burst: {
     position: 'absolute',
-    left: 8,
-    top: 8,
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: 'rgba(217, 37, 37, 0.3)',
+    backgroundColor: 'rgba(235, 77, 75, 0.4)',
+  },
+  heartText: {
+    fontSize: 22,
+  },
+  countText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666666',
+    marginLeft: 6,
+  },
+  countTextLiked: {
+    color: '#EB4D4B',
   },
 });

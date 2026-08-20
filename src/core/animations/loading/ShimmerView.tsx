@@ -1,50 +1,39 @@
-import React, { memo, useEffect, useRef } from 'react';
-import { Animated, StyleProp, ViewStyle, StyleSheet, View } from 'react-native';
+import React, { memo, useEffect } from 'react';
+import { StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 
 export interface ShimmerViewProps {
   width?: number | string;
   height?: number;
-  borderRadius?: number;
   style?: StyleProp<ViewStyle>;
 }
 
 export const ShimmerView: React.FC<ShimmerViewProps> = memo(({
   width = '100%',
   height = 20,
-  borderRadius = 4,
   style,
 }) => {
-  const translateX = useRef(new Animated.Value(-150)).current;
+  const opacity = useSharedValue(0.3);
 
   useEffect(() => {
-    const animation = Animated.loop(
-      Animated.timing(translateX, {
-        toValue: 150,
-        duration: 1200,
-        useNativeDriver: true,
-      })
-    );
+    opacity.value = withRepeat(withTiming(0.8, { duration: 800 }), -1, true);
+  }, [opacity]);
 
-    animation.start();
-    return () => animation.stop();
-  }, [translateX]);
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
 
-  return (
-    <View style={[styles.container, { width: width as any, height, borderRadius }, style]}>
-      <Animated.View style={[styles.shimmer, { transform: [{ translateX }] }]} />
-    </View>
-  );
+  return <Animated.View style={[styles.shimmer, { width, height }, animatedStyle, style]} />;
 });
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#E1E9EE',
-    overflow: 'hidden',
-    position: 'relative',
-  },
   shimmer: {
-    width: 60,
-    height: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    backgroundColor: '#E1E9EE',
+    borderRadius: 4,
   },
 });
