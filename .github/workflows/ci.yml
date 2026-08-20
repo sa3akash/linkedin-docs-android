@@ -52,7 +52,7 @@ jobs:
         run: bun test
 
   build-and-release:
-    name: Build Android APK/AAB & Create GitHub Release
+    name: Build Android APK/AAB & Auto-Create GitHub Release
     runs-on: ubuntu-latest
     needs: unit-test
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
@@ -87,32 +87,30 @@ jobs:
             android/app/build/outputs/apk/release/*.apk
             android/app/build/outputs/bundle/release/*.aab
 
-      - name: Create Automated GitHub Release
+      - name: Set Release Tag Name
+        id: tag_name
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
+          else
+            echo "TAG_NAME=v1.0.${{ github.run_number }}" >> $GITHUB_ENV
+          fi
+
+      - name: Auto-Create GitHub Release with APK & AAB
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          tag_name: ${{ env.TAG_NAME }}
+          name: Release ${{ env.TAG_NAME }}
           body: |
             ## 🚀 Automated Production Build Release
-            - **Branch/Tag**: `${{ github.ref_name }}`
-            - **Commit**: `${{ github.sha }}`
-            - **Type Safety**: 100% Strict TypeScript verified
-            - **Android APK & AAB Artifacts Included**
+            - **Release Tag**: `${{ env.TAG_NAME }}`
+            - **Branch**: `${{ github.ref_name }}`
+            - **Commit SHA**: `${{ github.sha }}`
+            - **Type Safety**: 100% Strict TypeScript Verified
+            - **ESLint Quality**: 0 Errors, 0 Warnings Passed
+            - **Android APK & AAB Production Binaries Included Below**
           files: |
             android/app/build/outputs/apk/release/*.apk
             android/app/build/outputs/bundle/release/*.aab
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-
-# $ git add .
-# $ git commit -m "ci: add automated github release with APK and AAB build artifacts"
-# $ git push origin main
-# # To https://github.com/sa3akash/linkedin-docs-android.git
-# # c312392..277c987 main -> main
-
-# $ git tag v1.0.0
-# $ git push origin v1.0.0
-# # To https://github.com/sa3akash/linkedin-docs-android.git
-# # * [new tag] v1.0.0 -> v1.0.0
