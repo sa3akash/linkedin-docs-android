@@ -1,0 +1,54 @@
+{
+  "common": {
+    "welcome": "Welcome back",
+    "search": "Search",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry"
+  },
+  "auth": {
+    "login": "Sign In",
+    "register": "Join Now",
+    "email": "Email Address",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "otpVerify": "Verify OTP",
+    "biometricPrompt": "Authenticate with Biometrics to proceed"
+  },
+  "feed": {
+    "startPost": "Start a post",
+    "like": "Like",
+    "comment": "Comment",
+    "repost": "Repost",
+    "send": "Send",
+    "share": "Share",
+    "commentsHeader": "Comments"
+  },
+  "jobs": {
+    "searchPlaceholder": "Search jobs, titles, or companies",
+    "applyNow": "Easy Apply",
+    "savedJobs": "Saved Jobs",
+    "appliedJobs": "Applied Jobs"
+  },
+  "messages": {
+    "typing": "is typing...",
+    "typeMessage": "Write a message..."
+  },
+  "network": {
+    "connections": "Connections",
+    "connect": "Connect",
+    "pending": "Pending",
+    "recommendations": "People you may know"
+  },
+  "settings": {
+    "theme": "Appearance",
+    "language": "Language",
+    "biometrics": "Biometric Authentication",
+    "logout": "Sign Out"
+  }
+}

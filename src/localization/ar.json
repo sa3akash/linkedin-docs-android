@@ -1,0 +1,54 @@
+{
+  "common": {
+    "welcome": "مرحباً بعودتك",
+    "search": "بحث",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "loading": "جارٍ التحميل...",
+    "error": "حدث خطأ ما",
+    "retry": "إعادة المحاولة"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "register": "انضم الآن",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgotPassword": "هل نسيت كلمة المرور؟",
+    "otpVerify": "التحقق من رمز OTP",
+    "biometricPrompt": "المصادقة بالبصمة للمتابعة"
+  },
+  "feed": {
+    "startPost": "بدء منشور",
+    "like": "إعجاب",
+    "comment": "تعليق",
+    "repost": "إعادة نشر",
+    "send": "إرسال",
+    "share": "مشاركة",
+    "commentsHeader": "التعليقات"
+  },
+  "jobs": {
+    "searchPlaceholder": "البحث عن وظائف أو شركات",
+    "applyNow": "تقديم سريع",
+    "savedJobs": "الوظائف المحفوظة",
+    "appliedJobs": "الوظائف المُقدم عليها"
+  },
+  "messages": {
+    "typing": "يكتب الآن...",
+    "typeMessage": "اكتب رسالة..."
+  },
+  "network": {
+    "connections": "الشبكة والاتصالات",
+    "connect": "تواصل",
+    "pending": "قيد الانتظار",
+    "recommendations": "أشخاص قد تعرفهم"
+  },
+  "settings": {
+    "theme": "المظهر والنمط",
+    "language": "اللغة",
+    "biometrics": "المصادقة البيومترية",
+    "logout": "تسجيل الخروج"
+  }
+}

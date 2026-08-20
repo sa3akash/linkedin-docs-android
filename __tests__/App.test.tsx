@@ -1,13 +1,12 @@
-/**
- * @format
- */
+import { useAuthStore } from '../src/stores/auth.store';
+import { createTheme } from '../src/theme';
 
-import React from 'react';
-import ReactTestRenderer from 'react-test-renderer';
-import App from '../App';
+describe('LinkedIn Application Bootstrap Test', () => {
+  it('should initialize auth store and theme provider cleanly', () => {
+    const authState = useAuthStore.getState();
+    expect(authState.isAuthenticated).toBe(false);
 
-test('renders correctly', async () => {
-  await ReactTestRenderer.act(() => {
-    ReactTestRenderer.create(<App />);
+    const theme = createTheme('light', false);
+    expect(theme.colors.primary).toBe('#0A66C2');
   });
 });

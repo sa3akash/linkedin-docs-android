@@ -1,0 +1,54 @@
+{
+  "common": {
+    "welcome": "Bienvenido de nuevo",
+    "search": "Buscar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "loading": "Cargando...",
+    "error": "Algo salió mal",
+    "retry": "Reintentar"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "register": "Unirse Ahora",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "otpVerify": "Verificar OTP",
+    "biometricPrompt": "Autenticar con Biometría para continuar"
+  },
+  "feed": {
+    "startPost": "Crear publicación",
+    "like": "Me gusta",
+    "comment": "Comentar",
+    "repost": "Revisar",
+    "send": "Enviar",
+    "share": "Compartir",
+    "commentsHeader": "Comentarios"
+  },
+  "jobs": {
+    "searchPlaceholder": "Buscar empleos, títulos o empresas",
+    "applyNow": "Solicitud sencilla",
+    "savedJobs": "Empleos guardados",
+    "appliedJobs": "Solicitudes realizadas"
+  },
+  "messages": {
+    "typing": "está escribiendo...",
+    "typeMessage": "Escribe un mensaje..."
+  },
+  "network": {
+    "connections": "Contactos",
+    "connect": "Conectar",
+    "pending": "Pendiente",
+    "recommendations": "Gente que podrías conocer"
+  },
+  "settings": {
+    "theme": "Apariencia",
+    "language": "Idioma",
+    "biometrics": "Autenticación Biométrica",
+    "logout": "Cerrar Sesión"
+  }
+}
