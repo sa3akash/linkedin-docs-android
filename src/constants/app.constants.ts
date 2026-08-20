@@ -1,5 +1,6 @@
 export const APP_CONFIG = {
   APP_NAME: 'LinkedIn Enterprise',
+  VERSION: '1.0.0',
   API_BASE_URL: 'https://api.linkedin-enterprise.com/v1',
   SOCKET_URL: 'https://socket.linkedin-enterprise.com',
   TIMEOUT_MS: 15000,
