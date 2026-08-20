@@ -1,17 +1,17 @@
 import { PermissionsAndroid, Platform } from 'react-native';
 import { PermissionStatus } from './camera';
 
-export class MicrophonePermissionHandler {
+export class ContactsPermissionHandler {
   public static async request(): Promise<PermissionStatus> {
     if (Platform.OS === 'web') return 'GRANTED';
 
     if (Platform.OS === 'android') {
       try {
         const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
           {
-            title: 'Microphone Permission',
-            message: 'This app needs access to your microphone for voice notes and video calls.',
+            title: 'Contacts Permission',
+            message: 'This app needs access to your contacts to connect with your network colleagues.',
             buttonNeutral: 'Ask Me Later',
             buttonNegative: 'Cancel',
             buttonPositive: 'OK',
@@ -19,7 +19,7 @@ export class MicrophonePermissionHandler {
         );
         return granted === PermissionsAndroid.RESULTS.GRANTED ? 'GRANTED' : 'DENIED';
       } catch (err) {
-        console.warn('[MicrophonePermission] Request error:', err);
+        console.warn('[ContactsPermission] Request error:', err);
         return 'DENIED';
       }
     }
@@ -32,10 +32,10 @@ export class MicrophonePermissionHandler {
 
     if (Platform.OS === 'android') {
       try {
-        const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+        const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CONTACTS);
         return hasPermission ? 'GRANTED' : 'DENIED';
       } catch (err) {
-        console.warn('[MicrophonePermission] Check error:', err);
+        console.warn('[ContactsPermission] Check error:', err);
         return 'DENIED';
       }
     }

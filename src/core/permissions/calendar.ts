@@ -1,17 +1,17 @@
 import { PermissionsAndroid, Platform } from 'react-native';
 import { PermissionStatus } from './camera';
 
-export class MicrophonePermissionHandler {
+export class CalendarPermissionHandler {
   public static async request(): Promise<PermissionStatus> {
-    if (Platform.OS === 'web') return 'GRANTED';
+    if (Platform.OS === 'web') return 'UNSUPPORTED';
 
     if (Platform.OS === 'android') {
       try {
         const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          PermissionsAndroid.PERMISSIONS.READ_CALENDAR,
           {
-            title: 'Microphone Permission',
-            message: 'This app needs access to your microphone for voice notes and video calls.',
+            title: 'Calendar Permission',
+            message: 'This app needs access to your calendar to schedule interview events and reminders.',
             buttonNeutral: 'Ask Me Later',
             buttonNegative: 'Cancel',
             buttonPositive: 'OK',
@@ -19,7 +19,7 @@ export class MicrophonePermissionHandler {
         );
         return granted === PermissionsAndroid.RESULTS.GRANTED ? 'GRANTED' : 'DENIED';
       } catch (err) {
-        console.warn('[MicrophonePermission] Request error:', err);
+        console.warn('[CalendarPermission] Request error:', err);
         return 'DENIED';
       }
     }
@@ -28,14 +28,14 @@ export class MicrophonePermissionHandler {
   }
 
   public static async check(): Promise<PermissionStatus> {
-    if (Platform.OS === 'web') return 'GRANTED';
+    if (Platform.OS === 'web') return 'UNSUPPORTED';
 
     if (Platform.OS === 'android') {
       try {
-        const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+        const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CALENDAR);
         return hasPermission ? 'GRANTED' : 'DENIED';
       } catch (err) {
-        console.warn('[MicrophonePermission] Check error:', err);
+        console.warn('[CalendarPermission] Check error:', err);
         return 'DENIED';
       }
     }
