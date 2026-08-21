@@ -1,0 +1,32 @@
+diff --git a/node_modules/react-native-reanimated/android/src/main/cpp/worklets/CMakeLists.txt b/node_modules/react-native-reanimated/android/src/main/cpp/worklets/CMakeLists.txt
+index 235bd28..49e2cf4 100644
+--- a/node_modules/react-native-reanimated/android/src/main/cpp/worklets/CMakeLists.txt
++++ b/node_modules/react-native-reanimated/android/src/main/cpp/worklets/CMakeLists.txt
+@@ -7,7 +7,9 @@ find_package(fbjni REQUIRED CONFIG)
+ find_package(ReactAndroid REQUIRED CONFIG)
+ 
+ if(${JS_RUNTIME} STREQUAL "hermes")
+-    find_package(hermes-engine REQUIRED CONFIG)
++    if(ReactAndroid_VERSION_MINOR LESS 76)
++        find_package(hermes-engine REQUIRED CONFIG)
++    endif()
+ endif()
+ 
+ add_library(
+@@ -83,10 +85,12 @@ else()
+ endif()
+ 
+ if(${JS_RUNTIME} STREQUAL "hermes")
+-    target_link_libraries(
+-        worklets
+-        hermes-engine::libhermes
+-    )
++    if(ReactAndroid_VERSION_MINOR LESS 76)
++        target_link_libraries(
++            worklets
++            hermes-engine::libhermes
++        )
++    endif()
+ 
+     if(${HERMES_ENABLE_DEBUGGER})
+         if(ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
