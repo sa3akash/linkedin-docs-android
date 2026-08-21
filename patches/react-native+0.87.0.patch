@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/core/ShadowNode.h b/node_modules/react-native/ReactCommon/react/renderer/core/ShadowNode.h
+index a9f8a32..1388b31 100644
+--- a/node_modules/react-native/ReactCommon/react/renderer/core/ShadowNode.h
++++ b/node_modules/react-native/ReactCommon/react/renderer/core/ShadowNode.h
+@@ -30,6 +30,8 @@ struct ShadowNodeWrapper;
+ 
+ class ShadowNode : public Sealable, public DebugStringConvertible, public jsi::NativeState {
+  public:
++  using Shared = std::shared_ptr<const ShadowNode>;
++  using Weak = std::weak_ptr<const ShadowNode>;
+   using SharedListOfShared
+       [[deprecated("Use std::shared_ptr<const std::vector<std::shared_ptr<const ShadowNode>>> instead")]] =
+           std::shared_ptr<const std::vector<std::shared_ptr<const ShadowNode>>>;
