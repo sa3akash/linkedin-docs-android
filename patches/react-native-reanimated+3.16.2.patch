@@ -13,9 +13,7 @@ index 235bd28..376175f 100644
  endif()
  
  add_library(
-@@ -83,21 +85,19 @@ else()
- endif()
- 
+@@ -83,22 +85,21 @@
  if(${JS_RUNTIME} STREQUAL "hermes")
 -    target_link_libraries(
 -        worklets
@@ -34,6 +32,7 @@ index 235bd28..376175f 100644
 -                ReactAndroid::hermes_executor
 -            )
 -        endif()
+-    endif()
 +    if(ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
 +        target_link_libraries(
 +            worklets
@@ -50,4 +49,7 @@ index 235bd28..376175f 100644
 +                ReactAndroid::hermes_executor
 +            )
 +        endif()
-     endif()
++    endif()
+ elseif(${JS_RUNTIME} STREQUAL "jsc")
+     if(ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
+         target_link_libraries(
